@@ -19,4 +19,21 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+// home pubblica che non richiede autenticazione e chiunque può visualizzare la pagina
+Route::get('/', 'HomeController@index')->name('home');
+
+// home per l'Admin,che utilizza un controller dedicato, dove solo chi è registrato 
+// e loggato può accedere
+Route::get('/admin', 'Admin\HomeController@index')->name('admin.index');
+
+
+Route::middleware("auth")
+    ->namespace("Admin") // indica la cartella dove si trovano i controller
+    ->name("admin.") // Aggiungie prima del nome di ogni rotta questo prefisso
+    ->prefix("admin") // Aggiunge prima di ogni URI questo prefisso
+    ->group(function () {
+        Route::get('/', 'HomeController@index')->name('index');
+        Route::get('/test', 'HomeController@test')->name('test');
+
+        Route::resource("posts", "PostController");
+    });
